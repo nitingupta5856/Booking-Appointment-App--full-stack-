@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"  initial-scale=1.0">
+    <title>Form</title>
+    <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.js"
+    integrity="sha512-rozBdNtS7jw9BlC76YF1FQGjz17qQ0J/Vu9ZCFIW374sEy4EZRbRcUZa2RU/MZ90X2mnLU56F75VfdToGV0RiA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+   
+</head>
+<body>
+    <form  style="border: 1px solid black; width:500px; margin-right: 500px; margin: auto;" onsubmit="onsubmitbtn(event)">
+        <h3 style="color: red; text-align: center;">Book a Call</h3>
+        <p style=" text-align: center;">Book a call slot and our representative  you within 1hr of selected time</p>
+        <hr style="margin:5px ;">
+    <label style="margin: 5px;" >Name:</label>
+    <br>
+    <input id="username" type="text" name="username"  style="width: 480px; height: 25px; margin: 5px;" required>
+    <br>
+    <label for="email" style="margin: 5px;">Email:</label>
+    <br>
+    <input id="email" type="email" name="email"  style="width: 480px; height: 25px; margin: 5px;" required>
+    <br>
+    <label for="phone" style="margin: 5px;">Phone:</label>
+    <br>
+    <input id="phone" type="number" name="phone"  style="width: 480px; height: 25px; margin: 5px;" >
+    <br>
+  
+    
+    <br><br>
+   <button style="width: 490px; background-color: orange;border: none; height: 25px; margin: 5px; border-radius: 5%;" >GET A CALL</button>
+</form>
+<ul id="parentnode"></ul>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.2.0/axios.min.js"></script> -->
+<script>
+   async function onsubmitbtn(event){
+    event.preventDefault();
+    const name=event.target.username.value;
+    const email=event.target.email.value;
+    const phone=event.target.phone.value;
+    // localStorage.setItem('name',name);
+    // localStorage.setItem('email',email);
+    // localStorage.setItem('phone',phone);
+    // console.log(event)
+    const obj={
+        name,
+        email,
+        phone
+    }
+   await axios.post("http://localhost:3000/newuser/adduser",obj)
+ .then((respone)=>{
+    showNewUser(respone.data.newUserDetails)
+//    console.log(respone)
+ })
+ .catch((err)=>{
+    document.body.innerHTML= document.body.innerHTML+`<h1>something wrong</h1>`
+   console.log(err)
+ })
+    // localStorage.setItem ('userdetails',JSON.stringify(obj))
+    // localStorage.setItem (obj.email,JSON.stringify(obj));
+    // console.log(JSON.parse(localStorage.getItem(obj.email)))
+
+    // showNewUser(obj);
+     
+ }
+ window.addEventListener("DOMContentLoaded",()=>{
+    axios.get("http://localhost:3000/newuser/getusers")
+    .then((response)=>{
+      console.log(response)
+      
+      
+      for(var i=0; i<response.data.allUsers.length;i++){
+        showNewUser(response.data.allUsers[i])
+      }
+    })
+    .catch((error)=>{
+       console.log(error)
+    })
+    // const localStorageObj =localStorage;
+    // const localStoragekeys =Object.keys(localStorageObj);
+    // for(var i=0;i<localStoragekeys.length;i++){
+    //     // const key =localStoragekeys[i];
+    //     // const userDetailsString =localStorageObj[key];
+    //     // const userDetailsObj = JSON.parse(userDetailsString);
+    //     const userDetailsObj= JSON.parse(localStorageObj[localStoragekeys[i]])
+    //     showNewUser(userDetailsObj);
+       
+    // }
+ })
+    function showNewUser(user){
+        document.getElementById('username').value='';
+        document.getElementById('email').value='';
+        document.getElementById('phone').value='';
+        // if (localStorage.getItem(user.email) !== null){
+        // removeUserFromScreen(user.email);
+        // };
+const parentnode=document.getElementById('parentnode');
+const childnode =`<li id=${user.id}>${user.name}  - ${user.email} - ${user.phonenumber}
+    <button onClick=deleteUser('${user.id}')>Delete user</button>
+    <button onClick=editUser('${user.email}','${user.name}','${user.phonenumber}','${user.id}')>Edit</button>
+    </li>`
+parentnode.innerHTML=parentnode.innerHTML+childnode;
+    }
+
+    // edit user
+    function editUser(emailId,name,phone,userId){
+      
+   
+    //    console.log(res)
+    document.getElementById('email').value=emailId;
+        document.getElementById('username').value=name;
+       
+        document.getElementById('phone').value=phone;
+        deleteUser (userId)
+      
+
+       
+    }
+
+  // delete user
+   function deleteUser (userId){
+    console.log(userId)
+    // userId=100;
+    // userId="undefined"
+    axios.delete(`http://localhost:3000/newuser/deleteuser/${userId}`)
+    .then((res)=>{
+    //    console.log(res)
+       removeUserFromScreen(userId)
+      
+    })
+    .catch((error)=>{
+console.log(error)
+    })
+    // localStorage.removeItem(emailId);
+    // removeUserFromScreen(emailId)
+   
+   }
+   function  removeUserFromScreen(userId){
+    const parentnode=document.getElementById('parentnode');
+    const childNodeForDelete=document.getElementById(userId);
+   if(childNodeForDelete){
+    parentnode.removeChild(childNodeForDelete);
+   }
+
+        
+  
+   
+   }
+
+</script>
+
+</body>
+</html>
